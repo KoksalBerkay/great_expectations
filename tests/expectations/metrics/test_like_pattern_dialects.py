@@ -1,5 +1,5 @@
 from inspect import unwrap
-from types import SimpleNamespace
+from types import ModuleType, SimpleNamespace
 from typing import Any
 
 import pytest
@@ -16,6 +16,10 @@ from great_expectations.expectations.metrics.column_map_metrics import (
 from great_expectations.expectations.metrics.util import (
     get_dialect_like_pattern_expression,
 )
+
+
+class _DialectModule(ModuleType):
+    dialect: type[Any]
 
 
 class _OracleDialectSubclass(OracleDialect):
@@ -39,9 +43,12 @@ def test_like_pattern_expression_supports_oracle_and_singlestore_dialect_subclas
     dialect_class: type[Any],
     positive: bool,
 ) -> None:
+    dialect = _DialectModule("test_dialect")
+    dialect.dialect = dialect_class
+
     expression = get_dialect_like_pattern_expression(
-        column=sa.column("value"),
-        dialect=SimpleNamespace(dialect=dialect_class),
+        column=sa.Column("value", sa.String()),
+        dialect=dialect,
         like_pattern="foo%",
         positive=positive,
     )
