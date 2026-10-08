@@ -308,11 +308,11 @@ def test_include_unexpected_rows_postgres(batch_for_datasource: Batch) -> None:
     assert "ghi" in unexpected_rows_str
 
 
-# BigQuery is excluded: GoogleSQL has no ESCAPE clause, asserted separately as a unit test.
+# BigQuery and SingleStore have no ESCAPE clause; their rejection is tested separately.
 ESCAPE_DATA_SOURCES: Sequence[DataSourceTestConfig] = [
     config
     for config in SUPPORTED_DATA_SOURCES
-    if not isinstance(config, BigQueryDatasourceTestConfig)
+    if not isinstance(config, (BigQueryDatasourceTestConfig, SingleStoreDatasourceTestConfig))
 ]
 
 
